@@ -89,23 +89,29 @@ limitations under the License.
         }
 
         ready() {
-          super.ready();
+          // Prevent header cell repositioning when super() method is called after idleTimeout.
+          this.style.paddingTop = '10px';
 
-          this.addEventListener('mouseenter', () => {
-            this._dropdownHidden = false;
-            this._mouseover = true;
-          });
+          // Defer expensive super() call until browser idle period.
+          Polymer.Async.idlePeriod.run(() => {
+            super.ready();
 
-          this.addEventListener('mouseleave', () => {
-            this._mouseover = false;
-            if (!this.dropdownOpened) {
-              this._dropdownHidden = true;
-            }
-          });
+            this.addEventListener('mouseenter', () => {
+              this._dropdownHidden = false;
+              this._mouseover = true;
+            });
 
-          this.addEventListener('click', (e) => {
-            this.querySelector('px-data-grid-sorter').click();
-          });
+            this.addEventListener('mouseleave', () => {
+              this._mouseover = false;
+              if (!this.dropdownOpened) {
+                this._dropdownHidden = true;
+              }
+            });
+
+            this.addEventListener('click', (e) => {
+              this.querySelector('px-data-grid-sorter').click();
+            });
+          }, 2000);
         }
 
         _freezeColumn() {
